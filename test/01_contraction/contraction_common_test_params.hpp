@@ -53,6 +53,17 @@ namespace hiptensor
         using AlphaT       = double;
         using BetaT        = double;
 
+        using ProblemParams = std::tuple<TestDataTypeT, 
+                                         TestComputeTypeT, 
+                                         AlgorithmT, 
+                                         OperatorT, 
+                                         WorkSizePrefT, 
+                                         LogLevelT, 
+                                         LengthsT, 
+                                         StridesT, 
+                                         AlphaT, 
+                                         BetaT>;
+
         //TODO: Include after kernel generator/ kernel base class is created
         // using KernelT      = std::shared_ptr<KernelI>; // Kernel test interface
 

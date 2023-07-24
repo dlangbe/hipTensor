@@ -24,73 +24,83 @@
  *
  *******************************************************************************/
 
+
+#include <algorithm>
+#include <fstream>
+#include <iterator>
+#include <numeric>
+#include <unordered_map>
 #include <tuple>
 #include <vector>
 
+// hiptensor includes
+#include <hiptensor/hiptensor.hpp>
+#include <hiptensor/hiptensor_types.hpp>
+#include <hiptensor/internal/hiptensor_utility.hpp>
+
+#include "contraction_test.hpp"
+#include "contraction_resource.hpp"
+#include "common.hpp"
 #include "contraction_common_test_params.hpp"
 #include "../kernel_generator.hpp"
 
 namespace hiptensor
 {
-    struct TestParams : public CommonTestParams
+    struct TestParams : public ContractionCommonTestParams
     {
-        using Base = CommonTestParams;
+        using Base = ContractionCommonTestParams;
 
-        // Types: ALL + double
-        // Block Sizes: 16 x 16 x BlockK
-        // Layouts: NT
-        using Types      = std::tuple<std::tuple<float16_t, float32_t, float32_t>>;
-        using BlockSizes = std::tuple<std::tuple<I<16>, I<16>, I<16>>>;
-        using Layouts    = std::tuple<
-            std::tuple<col_major, row_major, col_major>>; //typename Base::TestLayoutsNT;
+        // // Assemble the kernel generator
+        // // Kernel: MmaSyncMulti
+        // using GeneratorImpl   = typename Base::KernelGeneratorImpl;
+        // using KernelGenerator = KernelGenerator<KernelParams, GeneratorImpl>;
 
-        using KernelParams = typename CombineLists<Types, BlockSizes, Layouts>::Result;
+        // // Sanity check for kernel generator
+        // static_assert(std::is_same<typename GeneratorImpl::ResultT, typename Base::KernelT>::value,
+        //               "Kernels from this generator do not match testing interface");
 
-        // Assemble the kernel generator
-        // Kernel: MmaSyncMulti
-        using GeneratorImpl   = typename Base::KernelGeneratorImpl;
-        using KernelGenerator = KernelGenerator<KernelParams, GeneratorImpl>;
-
-        // Sanity check for kernel generator
-        static_assert(std::is_same<typename GeneratorImpl::ResultT, typename Base::KernelT>::value,
-                      "Kernels from this generator do not match testing interface");
-
-        static inline typename KernelGenerator::ResultT kernels()
-        {
-            return KernelGenerator::generate();
-        }
-
-        static inline std::vector<ThreadBlockT> threadBlocks()
-        {
-            auto warpSize = HipDevice::instance()->warpSize();
-            return {
-                //{warpSize, 1},
-                {warpSize * 2, 2},
-                //{warpSize, 4}, {warpSize * 2, 1}, {warpSize * 2, 2}, {warpSize * 4, 1}
-            };
-        }
-
-        static inline std::vector<ProblemSizeT> problemSizes()
-        {
-            return {
-                //{64, 64, 1024},
-                //         {32, 64, 1024},
-                // {64, 32, 1024},
-                // {256, 256, 1024},
-                //{1024, 1024, 1024},
-                //{64, 64, 64},
-                {128, 128, 128},
-                //{2048, 2048, 2048},
-                //{7168, 7168, 7168}
-
-            };
-        }
+        // static inline typename KernelGenerator::ResultT kernels()
+        // {
+        //     return KernelGenerator::generate();
+        // }
     };
 }
 
-int main()
+class ContractionTestBasic : public hiptensor::ContractionTest
 {
+};
 
-
-    return 0;
+TEST_P(ContractionTestBasic, RunKernel)
+{
+    // static bool ranWarmup = false;
+    // if(!ranWarmup)
+    // {
+    //     this->Warmup();
+    //     ranWarmup = true;
+    // }
+    this->RunKernel();
 }
+
+INSTANTIATE_TEST_SUITE_P(
+    ContractionTests,
+    ContractionTestBasic,
+    ::testing::Combine(::testing::ValuesIn(hiptensor::TestParams::dataTypes()),
+                       ::testing::ValuesIn(hiptensor::TestParams::computeTypes()),
+                       ::testing::ValuesIn(hiptensor::TestParams::algorithms()),
+                       ::testing::ValuesIn(hiptensor::TestParams::operators()),
+                       ::testing::ValuesIn(hiptensor::TestParams::workSizePrefrences()),
+                       ::testing::ValuesIn(hiptensor::TestParams::logLevels()),
+                       ::testing::ValuesIn(hiptensor::TestParams::problemLengths()),
+                       ::testing::ValuesIn(hiptensor::TestParams::problemStrides()),
+                       ::testing::ValuesIn(hiptensor::TestParams::alphas()),
+                       ::testing::ValuesIn(hiptensor::TestParams::betas())));
+
+// int main()
+// {
+//     using ProblemParams = hiptensor::ContractionCommonTestParams::ProblemParams;
+//     std::vector<ProblemParams> params;
+
+//     std::cout << "test\n";
+
+//     return 0;
+// }
