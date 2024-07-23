@@ -35,6 +35,50 @@ namespace hiptensor
     class ContractionSolution;
     struct PerfMetrics;
 
+    namespace internal
+    {
+        template <typename T>
+        __device__ inline double toDouble(T const& val);
+
+        __device__ inline double maxDouble(double a, double b);
+
+        inline double getEpsilon(hiptensorComputeType_t id);
+
+        __device__ inline unsigned pcg_hash(unsigned input);
+        
+        template <unsigned range>
+        __device__ inline float gen_random_float(unsigned input);
+
+        template <typename DataType>
+        __global__ void fillKernel(DataType* data, uint32_t elementSize);
+
+        template <typename DataType>
+        __host__ static inline void fillLaunchKernel(DataType* data, uint32_t elementSize);
+
+        template <typename DataType>
+        __global__ void fillValKernel(DataType* data, uint32_t elementSize, DataType value);
+
+        template <typename DataType>
+        __host__ static inline void
+            fillValLaunchKernel(DataType* data, uint32_t elementSize, DataType value);
+
+        __global__ static void
+        maxReduceKernel(double* relativeError, uint32_t elements, uint32_t offset, uint32_t maxElements);
+
+        template <typename DDataType>
+        __global__ void compareEqualKernel(DDataType* deviceD,
+                                        DDataType* hostD,
+                                        double*    relativeError,
+                                        uint32_t   elementsD);
+
+        template <typename DDataType>
+        std::pair<bool, double> compareEqualLaunchKernel(DDataType*             deviceD,
+                                                        DDataType*             hostD,
+                                                        std::size_t            elementsD,
+                                                        hiptensorComputeType_t computeType,
+                                                        double                 tolerance = 100.0);
+    }
+
     hiptensorStatus_t bruteForceModel(ContractionSolution**                    winner,
                                       std::vector<ContractionSolution*> const& candidates,
                                       hipDataType                              typeA,
