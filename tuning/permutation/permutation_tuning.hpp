@@ -26,6 +26,10 @@
 
 #ifndef PERMUTATION_TUNING_HPP
 #define PERMUTATION_TUNING_HPP
+
+#include <numeric>
+#include <unordered_map>
+
 #include "permutation_instance.hpp"
 
 namespace hiptensor
@@ -37,15 +41,18 @@ namespace hiptensor
             template <int RANK>
             auto make_permutation_params(int argc, char* argv[])
             {
+                std::cout << "---\n";
                 std::vector<std::size_t> inputLengths(RANK);
                 for(int i = 0; i < RANK; i++)
                 {
                     inputLengths[i] = atoi(argv[i + 2]);
+                    std::cout << inputLengths[i] << ", ";
                 }
                 std::vector<ck::index_t> outputDims(RANK);
                 for(int i = 0; i < RANK; i++)
                 {
                     outputDims[i] = atoi(argv[i + RANK + 2]);
+                    std::cout << outputDims[i]<< ", ";
                 }
                 std::unordered_map<ck::index_t, std::size_t> outputLengthMap;
                 for(ck::index_t i = 0; i < RANK; i++)
@@ -132,8 +139,8 @@ namespace hiptensor
 
                     if(!broadcastPermute->IsSupportedArgument(argument.get()))
                     {
-                        std::cout << broadcastPermute->GetTypeString()
-                                  << " does not support this input tensor:\n";
+                        // std::cout << broadcastPermute->GetTypeString()
+                        //           << " does not support this input tensor:\n";
                         continue;
                     };
 

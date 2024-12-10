@@ -60,6 +60,7 @@ int main(int argc, char* argv[])
     auto params = hiptensor::tuning::permutation::make_permutation_params<RANK>(argc, argv);
     if(std::string(argv[1]) == "F16")
     {
+        std::cout << "F16\n";
         hiptensor::tuning::permutation::run<
             decltype(hiptensor::tuning::permutation::genInstances_F16_3),
             hiptensor::tuning::F16,
@@ -72,6 +73,7 @@ int main(int argc, char* argv[])
     }
     else
     {
+        std::cout << "F32\n";
         hiptensor::tuning::permutation::run<
             decltype(hiptensor::tuning::permutation::genInstances_F32_3),
             hiptensor::tuning::F32,
