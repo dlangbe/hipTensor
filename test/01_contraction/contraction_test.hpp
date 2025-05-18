@@ -109,12 +109,12 @@ namespace hiptensor
 
     protected:
         // Workspace items
-        hiptensorHandle_t*               handle = nullptr;
-        hiptensorContractionPlan_t       plan;
-        hiptensorContractionDescriptor_t desc;
-        hiptensorContractionFind_t       find;
-        uint64_t                         worksize;
-        void*                            workspace = nullptr;
+        hiptensorHandle_t*             handle = nullptr;
+        hiptensorContractionPlan_t     plan;
+        hiptensorOperationDescriptor_t desc;
+        hiptensorContractionFind_t     find;
+        uint64_t                       worksize;
+        void*                          workspace = nullptr;
 
         hiptensorTensorDescriptor_t a_ms_ks, b_ns_ks, c_ms_ns, d_ms_ns;
 

@@ -118,7 +118,7 @@ namespace hiptensor
             return ElementWiseOperatorType_v<typename MetaTraitsT::BOp>;
         }
 
-        ContractionOpId_t opCDE() const override
+        hiptensorOperationId_t opCDE() const override
         {
             return ContractionOperatorType_v<typename MetaTraitsT::CDEOp>;
         }

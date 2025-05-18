@@ -49,7 +49,7 @@ namespace hiptensor
                                                   hiptensorDataType_t          typeD,
                                                   hiptensorOperator_t          opA,
                                                   hiptensorOperator_t          opB,
-                                                  ContractionOpId_t            opCDE,
+                                                  hiptensorOperationId_t       opCDE,
                                                   hiptensorComputeDescriptor_t typeCompute) const
     {
         auto solutionHash = hashSolution(
@@ -74,7 +74,7 @@ namespace hiptensor
     }
 
     ContractionSolutionRegistry::Query
-        ContractionSolutionRegistry::Query::query(ContractionOpId_t opCDE) const
+        ContractionSolutionRegistry::Query::query(hiptensorOperationId_t opCDE) const
     {
         return query(hashContractionOps(opCDE));
     }
@@ -121,7 +121,7 @@ namespace hiptensor
                                                          hiptensorDataType_t          typeD,
                                                          hiptensorOperator_t          opA,
                                                          hiptensorOperator_t          opB,
-                                                         ContractionOpId_t            opCDE,
+                                                         hiptensorOperationId_t       opCDE,
                                                          hiptensorComputeDescriptor_t typeCompute)
     {
         return Hash{}(
@@ -157,7 +157,7 @@ namespace hiptensor
 
     /* static */
     ContractionSolutionRegistry::Query::HashId
-        ContractionSolutionRegistry::Query::hashContractionOps(ContractionOpId_t opCDE)
+        ContractionSolutionRegistry::Query::hashContractionOps(hiptensorOperationId_t opCDE)
     {
         return Hash{}(opCDE);
     }

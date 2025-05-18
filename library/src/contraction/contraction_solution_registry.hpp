@@ -68,7 +68,7 @@ namespace hiptensor
                         hiptensorDataType_t          typeD,
                         hiptensorOperator_t          opA,
                         hiptensorOperator_t          opB,
-                        ContractionOpId_t            opCDE,
+                        hiptensorOperationId_t       opCDE,
                         hiptensorComputeDescriptor_t typeCompute) const;
 
             // By data types
@@ -79,7 +79,7 @@ namespace hiptensor
                         hiptensorComputeDescriptor_t typeCompute) const;
 
             // By contraction operation
-            Query query(ContractionOpId_t opCDE) const;
+            Query query(hiptensorOperationId_t opCDE) const;
 
             // Full map of Uid to ContractionSolution*
             std::unordered_map<Uid, ContractionSolution*> const& solutions() const;
@@ -103,7 +103,7 @@ namespace hiptensor
                                        hiptensorDataType_t          typeD,
                                        hiptensorOperator_t          opA,
                                        hiptensorOperator_t          opB,
-                                       ContractionOpId_t            opCDE,
+                                       hiptensorOperationId_t       opCDE,
                                        hiptensorComputeDescriptor_t typeCompute);
 
             static HashId hashDimsMNK(int32_t dimsM, int32_t dimsN, int32_t dimsK);
@@ -113,7 +113,7 @@ namespace hiptensor
                                                hiptensorDataType_t          typeD,
                                                hiptensorComputeDescriptor_t typeCompute);
             static HashId hashElementOps(hiptensorOperator_t opA, hiptensorOperator_t opB);
-            static HashId hashContractionOps(ContractionOpId_t opCDE);
+            static HashId hashContractionOps(hiptensorOperationId_t opCDE);
 
             // Adding solutions to the query
             void addSolution(ContractionSolution* solution);

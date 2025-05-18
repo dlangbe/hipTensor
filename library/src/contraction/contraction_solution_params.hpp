@@ -56,9 +56,9 @@ namespace hiptensor
         virtual hiptensorComputeDescriptor_t typeCompute() const = 0;
 
         // Map to operators
-        virtual hiptensorOperator_t opA() const   = 0;
-        virtual hiptensorOperator_t opB() const   = 0;
-        virtual ContractionOpId_t   opCDE() const = 0;
+        virtual hiptensorOperator_t    opA() const   = 0;
+        virtual hiptensorOperator_t    opB() const   = 0;
+        virtual hiptensorOperationId_t opCDE() const = 0;
     };
 
 } // namespace hiptensor
