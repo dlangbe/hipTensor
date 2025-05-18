@@ -71,7 +71,6 @@ namespace hiptensor
 
     void ContractionTest::reset()
     {
-        handle    = nullptr;
         workspace = nullptr;
 
         worksize = 0u;
@@ -304,49 +303,9 @@ namespace hiptensor
                                                 size_t{1},
                                                 std::multiplies<size_t>());
 
-            CHECK_HIPTENSOR_ERROR(hiptensorCreate(&handle));
+            CHECK_HIPTENSOR_ERROR(hiptensorCreate(handle));
 
             CHECK_HIPTENSOR_ERROR(hiptensorLoggerSetMask(logLevel));
-
-            // lengths - m, n, u, v, h, k
-            CHECK_HIPTENSOR_ERROR(hiptensorInitTensorDescriptor(
-                handle,
-                &a_ms_ks,
-                a_ms_ks_lengths.size(),
-                a_ms_ks_lengths.data(),
-                strides.empty() ? NULL : a_ms_ks_strides.data(), /*stride*/
-                ADataType,
-                operatorType));
-
-            CHECK_HIPTENSOR_ERROR(hiptensorInitTensorDescriptor(
-                handle,
-                &b_ns_ks,
-                b_ns_ks_lengths.size(),
-                b_ns_ks_lengths.data(),
-                strides.empty() ? NULL : b_ns_ks_strides.data(), /*stride*/
-                BDataType,
-                operatorType));
-
-            if(CDataType != NONE_TYPE)
-            {
-                CHECK_HIPTENSOR_ERROR(hiptensorInitTensorDescriptor(
-                    handle,
-                    &c_ms_ns,
-                    cd_ms_ns_lengths.size(),
-                    cd_ms_ns_lengths.data(),
-                    strides.empty() ? NULL : cd_ms_ns_strides.data(), /*stride*/
-                    CDataType,
-                    operatorType));
-            }
-
-            CHECK_HIPTENSOR_ERROR(hiptensorInitTensorDescriptor(
-                handle,
-                &d_ms_ns,
-                cd_ms_ns_lengths.size(),
-                cd_ms_ns_lengths.data(),
-                strides.empty() ? NULL : cd_ms_ns_strides.data(), /*stride*/
-                DDataType,
-                operatorType));
 
             std::tuple<int32_t, int32_t, int32_t, int32_t> elementBytes(
                 hiptensorDataTypeSize(ADataType),
@@ -356,6 +315,65 @@ namespace hiptensor
 
             auto resource = getResource();
             resource->resizeStorage(lengths, elementBytes);
+
+            uint32_t alignmentRequirementA;
+            CHECK_HIPTENSOR_ERROR(hiptensorGetAlignmentRequirement(
+                *handle, resource->deviceA().get(), &a_ms_ks, &alignmentRequirementA));
+
+            uint32_t alignmentRequirementB;
+            CHECK_HIPTENSOR_ERROR(hiptensorGetAlignmentRequirement(
+                *handle, resource->deviceB().get(), &b_ns_ks, &alignmentRequirementB));
+
+            uint32_t alignmentRequirementC = 0;
+            if(CDataType != NONE_TYPE)
+            {
+                CHECK_HIPTENSOR_ERROR(hiptensorGetAlignmentRequirement(
+                    *handle, resource->deviceC().get(), &c_ms_ns, &alignmentRequirementC));
+            }
+
+            uint32_t alignmentRequirementD;
+            CHECK_HIPTENSOR_ERROR(hiptensorGetAlignmentRequirement(
+                *handle, resource->deviceD().get(), &d_ms_ns, &alignmentRequirementD));
+
+            // lengths - m, n, u, v, h, k
+            CHECK_HIPTENSOR_ERROR(hiptensorCreateTensorDescriptor(
+                *handle,
+                &a_ms_ks,
+                a_ms_ks_lengths.size(),
+                a_ms_ks_lengths.data(),
+                strides.empty() ? NULL : a_ms_ks_strides.data(), /*stride*/
+                ADataType,
+                alignmentRequirementA));
+
+            CHECK_HIPTENSOR_ERROR(hiptensorCreateTensorDescriptor(
+                *handle,
+                &b_ns_ks,
+                b_ns_ks_lengths.size(),
+                b_ns_ks_lengths.data(),
+                strides.empty() ? NULL : b_ns_ks_strides.data(), /*stride*/
+                BDataType,
+                alignmentRequirementB));
+
+            if(CDataType != NONE_TYPE)
+            {
+                CHECK_HIPTENSOR_ERROR(hiptensorCreateTensorDescriptor(
+                    *handle,
+                    &c_ms_ns,
+                    cd_ms_ns_lengths.size(),
+                    cd_ms_ns_lengths.data(),
+                    strides.empty() ? NULL : cd_ms_ns_strides.data(), /*stride*/
+                    CDataType,
+                    alignmentRequirementC));
+            }
+
+            CHECK_HIPTENSOR_ERROR(hiptensorCreateTensorDescriptor(
+                *handle,
+                &d_ms_ns,
+                cd_ms_ns_lengths.size(),
+                cd_ms_ns_lengths.data(),
+                strides.empty() ? NULL : cd_ms_ns_strides.data(), /*stride*/
+                DDataType,
+                alignmentRequirementD));
 
             uint32_t seed = static_cast<uint32_t>(256);
 
@@ -462,27 +480,8 @@ namespace hiptensor
 
             resource->copyDeviceToHostAll(elementBytes);
 
-            uint32_t alignmentRequirementA;
-            CHECK_HIPTENSOR_ERROR(hiptensorGetAlignmentRequirement(
-                handle, resource->deviceA().get(), &a_ms_ks, &alignmentRequirementA));
-
-            uint32_t alignmentRequirementB;
-            CHECK_HIPTENSOR_ERROR(hiptensorGetAlignmentRequirement(
-                handle, resource->deviceB().get(), &b_ns_ks, &alignmentRequirementB));
-
-            uint32_t alignmentRequirementC = 0;
-            if(CDataType != NONE_TYPE)
-            {
-                CHECK_HIPTENSOR_ERROR(hiptensorGetAlignmentRequirement(
-                    handle, resource->deviceC().get(), &c_ms_ns, &alignmentRequirementC));
-            }
-
-            uint32_t alignmentRequirementD;
-            CHECK_HIPTENSOR_ERROR(hiptensorGetAlignmentRequirement(
-                handle, resource->deviceD().get(), &d_ms_ns, &alignmentRequirementD));
-
             CHECK_HIPTENSOR_ERROR(hiptensorInitContractionDescriptor(
-                handle,
+                *handle,
                 &desc,
                 &a_ms_ks,
                 a_ms_ks_modes.data(),
@@ -501,13 +500,13 @@ namespace hiptensor
             * Set the algorithm to use
             ***************************/
 
-            CHECK_HIPTENSOR_ERROR(hiptensorInitContractionFind(handle, &find, algorithm));
+            CHECK_HIPTENSOR_ERROR(hiptensorInitContractionFind(*handle, &find, algorithm));
 
             /**********************
             * Query workspace
             **********************/
             CHECK_HIPTENSOR_ERROR(hiptensorContractionGetWorkspaceSize(
-                handle, &desc, &find, workSizePref, &worksize));
+                *handle, &desc, &find, workSizePref, &worksize));
 
             if(worksize > 0)
             {
@@ -761,7 +760,7 @@ namespace hiptensor
             writeVal(&betaBuf, computeType, ScalarData(computeType, beta[0], beta[1]));
 
             CHECK_HIPTENSOR_ERROR(
-                hiptensorInitContractionPlan(handle, &plan, &desc, &find, worksize));
+                hiptensorInitContractionPlan(*handle, &plan, &desc, &find, worksize));
 
             auto resource = getResource();
 
@@ -770,7 +769,7 @@ namespace hiptensor
             CHECK_HIP_ERROR(hipEventCreate(&stopEvent));
             CHECK_HIP_ERROR(hipEventRecord(startEvent));
 
-            CHECK_HIPTENSOR_ERROR(hiptensorContraction(handle,
+            CHECK_HIPTENSOR_ERROR(hiptensorContraction(*handle,
                                                        &plan,
                                                        (void*)&alphaBuf,
                                                        resource->deviceA().get(),
