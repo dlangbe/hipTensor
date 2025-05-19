@@ -55,7 +55,7 @@ namespace
                                               const hiptensorTensorDescriptor_t* descD,
                                               const int32_t*                     modeD,
                                               hiptensorOperator_t                opReduce,
-                                              hiptensorComputeDescriptor_t       typeCompute,
+                                              hiptensorComputeDescriptor_t       descCompute,
                                               void*                              workspace,
                                               uint64_t                           workspaceSize)
     {
@@ -104,7 +104,7 @@ namespace
                 HIPTENSOR_R_64F, HIPTENSOR_R_64F, HIPTENSOR_R_64F, HIPTENSOR_COMPUTE_DESC_64F),
         };
 
-        if(supportedTypes.find(hashGenerator(descA->mType, descC->mType, descD->mType, typeCompute))
+        if(supportedTypes.find(hashGenerator(descA->mType, descC->mType, descD->mType, descCompute))
            == supportedTypes.end())
         {
             auto errorCode = HIPTENSOR_STATUS_NOT_SUPPORTED;
@@ -157,7 +157,7 @@ hiptensorStatus_t hiptensorReduction(const hiptensorHandle_t            handle,
                                      const hiptensorTensorDescriptor_t* descD,
                                      const int32_t                      modeD[],
                                      hiptensorOperator_t                opReduce,
-                                     hiptensorComputeDescriptor_t       typeCompute,
+                                     hiptensorComputeDescriptor_t       descCompute,
                                      void*                              workspace,
                                      uint64_t                           workspaceSize,
                                      hipStream_t                        stream)
@@ -169,7 +169,7 @@ hiptensorStatus_t hiptensorReduction(const hiptensorHandle_t            handle,
     snprintf(msg,
              sizeof(msg),
              "hiptensorReduction: handle=%p, alpha=%p, A=%p, descA=%p, modeA=%p, beta=%p, C=%p, "
-             "descC=%p, modeC=%p, D=%p, descD=%p, modeD=%p, opReduce=%s, typeCompute=%s, "
+             "descC=%p, modeC=%p, D=%p, descD=%p, modeD=%p, opReduce=%s, descCompute=%s, "
              "workspace=%p, workspaceSize=%lu, stream=%p",
              &handle,
              alpha,
@@ -184,7 +184,7 @@ hiptensorStatus_t hiptensorReduction(const hiptensorHandle_t            handle,
              descD,
              modeD,
              hiptensor::opTypeToString(opReduce).c_str(),
-             hiptensor::computeTypeToString(typeCompute).c_str(),
+             hiptensor::computeTypeToString(descCompute).c_str(),
              workspace,
              workspaceSize,
              stream);
@@ -204,7 +204,7 @@ hiptensorStatus_t hiptensorReduction(const hiptensorHandle_t            handle,
                                                 descD,
                                                 modeD,
                                                 opReduce,
-                                                typeCompute,
+                                                descCompute,
                                                 workspace,
                                                 workspaceSize);
        errorCode != HIPTENSOR_STATUS_SUCCESS)
@@ -230,7 +230,7 @@ hiptensorStatus_t hiptensorReduction(const hiptensorHandle_t            handle,
                                           descD,
                                           modeD,
                                           HIPTENSOR_OP_ADD,
-                                          *hiptensor::convertToHipTensorDataType(typeCompute),
+                                          *hiptensor::convertToHipTensorDataType(descCompute),
                                           stream);
     }
 
@@ -251,8 +251,8 @@ hiptensorStatus_t hiptensorReduction(const hiptensorHandle_t            handle,
     auto ADataType    = descA->mType;
     auto DDataType    = descD->mType;
 
-    auto internalTypeCompute = typeCompute;
-    if(typeCompute == HIPTENSOR_COMPUTE_DESC_16F || typeCompute == HIPTENSOR_COMPUTE_DESC_16BF)
+    auto internalTypeCompute = descCompute;
+    if(descCompute == HIPTENSOR_COMPUTE_DESC_16F || descCompute == HIPTENSOR_COMPUTE_DESC_16BF)
     {
         // CK does not support f16 or bf16 as compute type
         internalTypeCompute = HIPTENSOR_COMPUTE_DESC_32F;
@@ -282,12 +282,12 @@ hiptensorStatus_t hiptensorReduction(const hiptensorHandle_t            handle,
     double alphaValue;
     if(alpha != nullptr)
     {
-        alphaValue = hiptensor::readVal<double>(alpha, typeCompute);
+        alphaValue = hiptensor::readVal<double>(alpha, descCompute);
     }
     double betaValue;
     if(beta != nullptr)
     {
-        betaValue = hiptensor::readVal<double>(beta, typeCompute);
+        betaValue = hiptensor::readVal<double>(beta, descCompute);
     }
 
     if(C && C != D)
@@ -388,7 +388,7 @@ hiptensorStatus_t hiptensorReductionGetWorkspaceSize(const hiptensorHandle_t    
                                                      const hiptensorTensorDescriptor_t* descD,
                                                      const int32_t                      modeD[],
                                                      hiptensorOperator_t                opReduce,
-                                                     hiptensorComputeDescriptor_t       typeCompute,
+                                                     hiptensorComputeDescriptor_t       descCompute,
                                                      uint64_t* workspaceSize)
 {
     *workspaceSize = 0;

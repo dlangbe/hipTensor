@@ -53,7 +53,7 @@ namespace hiptensor
         virtual hiptensorDataType_t          typeB() const       = 0;
         virtual hiptensorDataType_t          typeC() const       = 0;
         virtual hiptensorDataType_t          typeD() const       = 0;
-        virtual hiptensorComputeDescriptor_t typeCompute() const = 0;
+        virtual hiptensorComputeDescriptor_t descCompute() const = 0;
 
         // Map to operators
         virtual hiptensorOperator_t    opA() const   = 0;

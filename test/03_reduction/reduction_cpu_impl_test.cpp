@@ -35,7 +35,7 @@
 template <typename floatTypeA, typename floatTypeC, typename floatTypeCompute>
 auto reduceWithCpu(hiptensorDataType_t          typeA,
                    hiptensorDataType_t          typeC,
-                   hiptensorComputeDescriptor_t typeCompute)
+                   hiptensorComputeDescriptor_t descCompute)
 {
     floatTypeCompute alpha = (floatTypeCompute)1.2f;
     floatTypeCompute beta  = (floatTypeCompute)2.1f;
@@ -120,13 +120,13 @@ auto reduceWithCpu(hiptensorDataType_t          typeA,
                                                              &descC,
                                                              modeC.data(),
                                                              opReduce,
-                                                             typeCompute,
+                                                             descCompute,
                                                              &worksize));
 
     double alphaValue{};
     double betaValue{};
-    hiptensor::writeVal(&alphaValue, typeCompute, {typeCompute, alpha});
-    hiptensor::writeVal(&betaValue, typeCompute, {typeCompute, beta});
+    hiptensor::writeVal(&alphaValue, descCompute, {descCompute, alpha});
+    hiptensor::writeVal(&betaValue, descCompute, {descCompute, beta});
     CHECK_HIPTENSOR_ERROR(hiptensorReductionReference((const void*)&alphaValue,
                                                       aArray.data(),
                                                       &descA,
@@ -139,10 +139,10 @@ auto reduceWithCpu(hiptensorDataType_t          typeA,
                                                       &descC,
                                                       modeC.data(),
                                                       opReduce,
-                                                      typeCompute,
+                                                      descCompute,
                                                       0 /* stream */));
 
-    return compareEqual(referenceArray.data(), cArray.data(), cArray.size(), typeCompute);
+    return compareEqual(referenceArray.data(), cArray.data(), cArray.size(), descCompute);
 }
 
 TEST(ReductionCpuImplTest, CompareF32ResultWithReference)
@@ -153,10 +153,10 @@ TEST(ReductionCpuImplTest, CompareF32ResultWithReference)
 
     hiptensorDataType_t          typeA       = HIPTENSOR_R_32F;
     hiptensorDataType_t          typeC       = HIPTENSOR_R_32F;
-    hiptensorComputeDescriptor_t typeCompute = HIPTENSOR_COMPUTE_DESC_32F;
+    hiptensorComputeDescriptor_t descCompute = HIPTENSOR_COMPUTE_DESC_32F;
 
     auto [result, maxRelativeError]
-        = reduceWithCpu<floatTypeA, floatTypeC, floatTypeCompute>(typeA, typeC, typeCompute);
+        = reduceWithCpu<floatTypeA, floatTypeC, floatTypeCompute>(typeA, typeC, descCompute);
     EXPECT_TRUE(result) << "max_relative_error: " << maxRelativeError;
 }
 
@@ -168,10 +168,10 @@ TEST(ReductionCpuImplTest, CompareF64ResultWithReference)
 
     hiptensorDataType_t          typeA       = HIPTENSOR_R_64F;
     hiptensorDataType_t          typeC       = HIPTENSOR_R_64F;
-    hiptensorComputeDescriptor_t typeCompute = HIPTENSOR_COMPUTE_DESC_64F;
+    hiptensorComputeDescriptor_t descCompute = HIPTENSOR_COMPUTE_DESC_64F;
 
     auto [result, maxRelativeError]
-        = reduceWithCpu<floatTypeA, floatTypeC, floatTypeCompute>(typeA, typeC, typeCompute);
+        = reduceWithCpu<floatTypeA, floatTypeC, floatTypeCompute>(typeA, typeC, descCompute);
     EXPECT_TRUE(result) << "max_relative_error: " << maxRelativeError;
 }
 
@@ -183,9 +183,9 @@ TEST(ReductionCpuImplTest, CompareF64ResultWithReference)
 //
 // hiptensorDataType_t typeA       = HIPTENSOR_R_16F;
 // hiptensorDataType_t typeC       = HIPTENSOR_R_16F;
-// hiptensorComputeDescriptor_t typeCompute = HIPTENSOR_COMPUTE_DESC_16F;
+// hiptensorComputeDescriptor_t descCompute = HIPTENSOR_COMPUTE_DESC_16F;
 //
 // auto [result, maxRelativeError]
-// = reduceWithCpu<floatTypeA, floatTypeC, floatTypeCompute>(typeA, typeC, typeCompute);
+// = reduceWithCpu<floatTypeA, floatTypeC, floatTypeCompute>(typeA, typeC, descCompute);
 // EXPECT_TRUE(result) << "max_relative_error: " << maxRelativeError;
 // }

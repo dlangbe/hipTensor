@@ -40,7 +40,7 @@ template <typename ADataType,
           hiptensorDataType_t          typeA,
           hiptensorDataType_t          typeB,
           hiptensorDataType_t          typeD,
-          hiptensorComputeDescriptor_t typeCompute>
+          hiptensorComputeDescriptor_t descCompute>
 int scaleContractionSample(void* alpha)
 {
     /**********************
@@ -206,21 +206,20 @@ int scaleContractionSample(void* alpha)
     std::cout << "d_ms_ns: " << d_ms_ns << std::endl;
 
     hiptensorOperationDescriptor_t desc;
-    CHECK_HIPTENSOR_ERROR(hiptensorInitContractionDescriptor(*handle,
-                                                             &desc,
-                                                             &a_ms_ks,
-                                                             modeA.data(),
-                                                             alignmentRequirementA,
-                                                             &b_ns_ks,
-                                                             modeB.data(),
-                                                             alignmentRequirementB,
-                                                             nullptr,
-                                                             nullptr,
-                                                             0,
-                                                             &d_ms_ns,
-                                                             modeD.data(),
-                                                             alignmentRequirementD,
-                                                             typeCompute));
+    CHECK_HIPTENSOR_ERROR(hiptensorCreateContraction(*handle,
+                                                     &desc,
+                                                     &a_ms_ks,
+                                                     modeA.data(),
+                                                     HIPTENSOR_OP_IDENTITY,
+                                                     &b_ns_ks,
+                                                     modeB.data(),
+                                                     HIPTENSOR_OP_IDENTITY,
+                                                     nullptr,
+                                                     nullptr,
+                                                     HIPTENSOR_OP_IDENTITY,
+                                                     &d_ms_ns,
+                                                     modeD.data(),
+                                                     descCompute));
     /**************************
    * Set the algorithm to use
    ***************************/

@@ -35,7 +35,7 @@
 template <typename floatTypeA, typename floatTypeB, typename floatTypeCompute>
 auto permuteWithCpu(hiptensorDataType_t typeA,
                     hiptensorDataType_t typeB,
-                    hiptensorDataType_t typeCompute)
+                    hiptensorDataType_t descCompute)
 {
     std::vector<int> modeA{'w', 'h', 'c', 'n'};
     std::vector<int> modeB{'c', 'n', 'h', 'w'};
@@ -139,13 +139,13 @@ auto permuteWithCpu(hiptensorDataType_t typeA,
                                   bArray.data(),
                                   &descB,
                                   modeB.data(),
-                                  typeCompute,
+                                  descCompute,
                                   0);
 
     return compareEqual(referenceArray.data(),
                         bArray.data(),
                         bArray.size(),
-                        hiptensor::convertToComputeType(typeCompute),
+                        hiptensor::convertToComputeType(descCompute),
                         0);
 }
 
@@ -157,10 +157,10 @@ TEST(PermutationCpuImplTest, CompareF32ResultWithReference)
 
     hiptensorDataType_t typeA       = HIPTENSOR_R_32F;
     hiptensorDataType_t typeB       = HIPTENSOR_R_32F;
-    hiptensorDataType_t typeCompute = HIPTENSOR_R_32F;
+    hiptensorDataType_t descCompute = HIPTENSOR_R_32F;
 
     auto [result, maxRelativeError]
-        = permuteWithCpu<floatTypeA, floatTypeB, floatTypeCompute>(typeA, typeB, typeCompute);
+        = permuteWithCpu<floatTypeA, floatTypeB, floatTypeCompute>(typeA, typeB, descCompute);
     EXPECT_TRUE(result) << "max_relative_error: " << maxRelativeError;
 }
 
@@ -172,9 +172,9 @@ TEST(PermutationCpuImplTest, CompareF16ResultWithReference)
 
     hiptensorDataType_t typeA       = HIPTENSOR_R_16F;
     hiptensorDataType_t typeB       = HIPTENSOR_R_16F;
-    hiptensorDataType_t typeCompute = HIPTENSOR_R_16F;
+    hiptensorDataType_t descCompute = HIPTENSOR_R_16F;
 
     auto [result, maxRelativeError]
-        = permuteWithCpu<floatTypeA, floatTypeB, floatTypeCompute>(typeA, typeB, typeCompute);
+        = permuteWithCpu<floatTypeA, floatTypeB, floatTypeCompute>(typeA, typeB, descCompute);
     EXPECT_TRUE(result) << "max_relative_error: " << maxRelativeError;
 }

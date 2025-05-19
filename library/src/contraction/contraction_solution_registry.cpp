@@ -50,10 +50,10 @@ namespace hiptensor
                                                   hiptensorOperator_t          opA,
                                                   hiptensorOperator_t          opB,
                                                   hiptensorOperationId_t       opCDE,
-                                                  hiptensorComputeDescriptor_t typeCompute) const
+                                                  hiptensorComputeDescriptor_t descCompute) const
     {
         auto solutionHash = hashSolution(
-            dimsM, dimsN, dimsK, typeA, typeB, typeC, typeD, opA, opB, opCDE, typeCompute);
+            dimsM, dimsN, dimsK, typeA, typeB, typeC, typeD, opA, opB, opCDE, descCompute);
 
         if(auto solutions = mSolutionHash.find(solutionHash); solutions != mSolutionHash.end())
         {
@@ -68,9 +68,9 @@ namespace hiptensor
                                                   hiptensorDataType_t          typeB,
                                                   hiptensorDataType_t          typeC,
                                                   hiptensorDataType_t          typeD,
-                                                  hiptensorComputeDescriptor_t typeCompute) const
+                                                  hiptensorComputeDescriptor_t descCompute) const
     {
-        return query(hashTypesComputeABCD(typeA, typeB, typeC, typeD, typeCompute));
+        return query(hashTypesComputeABCD(typeA, typeB, typeC, typeD, descCompute));
     }
 
     ContractionSolutionRegistry::Query
@@ -122,10 +122,10 @@ namespace hiptensor
                                                          hiptensorOperator_t          opA,
                                                          hiptensorOperator_t          opB,
                                                          hiptensorOperationId_t       opCDE,
-                                                         hiptensorComputeDescriptor_t typeCompute)
+                                                         hiptensorComputeDescriptor_t descCompute)
     {
         return Hash{}(
-            dimsM, dimsN, dimsK, typeA, typeB, typeC, typeD, opA, opB, opCDE, typeCompute);
+            dimsM, dimsN, dimsK, typeA, typeB, typeC, typeD, opA, opB, opCDE, descCompute);
     }
 
     /* static */
@@ -142,9 +142,9 @@ namespace hiptensor
             hiptensorDataType_t          typeB,
             hiptensorDataType_t          typeC,
             hiptensorDataType_t          typeD,
-            hiptensorComputeDescriptor_t typeCompute)
+            hiptensorComputeDescriptor_t descCompute)
     {
-        return Hash{}(typeA, typeB, typeC, typeD, typeCompute);
+        return Hash{}(typeA, typeB, typeC, typeD, descCompute);
     }
 
     /* static */
@@ -181,7 +181,7 @@ namespace hiptensor
                                              params->opA(),
                                              params->opB(),
                                              params->opCDE(),
-                                             params->typeCompute());
+                                             params->descCompute());
 
             auto dimsMNKHash = hashDimsMNK(params->dimsM(), params->dimsN(), params->dimsK());
 
@@ -189,7 +189,7 @@ namespace hiptensor
                                                              params->typeB(),
                                                              params->typeC(),
                                                              params->typeD(),
-                                                             params->typeCompute());
+                                                             params->descCompute());
 
             auto elementOpsHash = hashElementOps(params->opA(), params->opB());
 

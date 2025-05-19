@@ -52,7 +52,7 @@ int main()
 
     hiptensorDataType_t          typeA       = HIPTENSOR_R_32F;
     hiptensorDataType_t          typeC       = HIPTENSOR_R_32F;
-    hiptensorComputeDescriptor_t typeCompute = HIPTENSOR_COMPUTE_DESC_32F;
+    hiptensorComputeDescriptor_t descCompute = HIPTENSOR_COMPUTE_DESC_32F;
 
     floatTypeCompute alpha = (floatTypeCompute)1.1f;
     floatTypeCompute beta  = (floatTypeCompute)0.f;
@@ -150,7 +150,7 @@ int main()
                                                              &descC,
                                                              modeC.data(),
                                                              opReduce,
-                                                             typeCompute,
+                                                             descCompute,
                                                              &worksize));
     void* work = nullptr;
     if(worksize > 0)
@@ -175,7 +175,7 @@ int main()
                                              &descC,
                                              modeC.data(),
                                              opReduce,
-                                             typeCompute,
+                                             descCompute,
                                              work,
                                              worksize,
                                              0 /* stream */));

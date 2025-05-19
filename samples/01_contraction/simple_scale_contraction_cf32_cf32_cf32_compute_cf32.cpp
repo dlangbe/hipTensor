@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
     constexpr hiptensorDataType_t          typeA       = HIPTENSOR_C_32F;
     constexpr hiptensorDataType_t          typeB       = HIPTENSOR_C_32F;
     constexpr hiptensorDataType_t          typeD       = HIPTENSOR_C_32F;
-    constexpr hiptensorComputeDescriptor_t typeCompute = HIPTENSOR_COMPUTE_DESC_C32F;
+    constexpr hiptensorComputeDescriptor_t descCompute = HIPTENSOR_COMPUTE_DESC_C32F;
 
     floatTypeCompute alpha(1, 1);
     return scaleContractionSample<ADataType,
@@ -53,5 +53,5 @@ int main(int argc, char* argv[])
                                   typeA,
                                   typeB,
                                   typeD,
-                                  typeCompute>(&alpha);
+                                  descCompute>(&alpha);
 }
