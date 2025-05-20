@@ -54,7 +54,7 @@ hiptensorStatus_t hiptensorContractionReference(const hiptensorContractionPlan_t
                                                 void*                             workspace)
 {
     auto& instances   = hiptensor::ContractionCpuReferenceInstances::instance();
-    auto  computeType = plan->mContractionDesc.mComputeType;
+    auto  computeType = plan->mContractionDesc->mComputeType;
     auto  candidates
         = (C == nullptr) ? instances->allSolutions().query(
               typeA, typeB, hiptensor::NONE_TYPE, typeD, computeType)

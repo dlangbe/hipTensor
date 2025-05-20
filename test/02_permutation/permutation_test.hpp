@@ -91,9 +91,9 @@ namespace hiptensor
 
     protected:
         // Workspace items
-        hiptensorHandle_t* handle = nullptr;
+        hiptensorHandle_t handle = nullptr;
 
-        hiptensorTensorDescriptor_t a_ms_ks, b_ns_ks, c_ms_ns, d_ms_ns;
+        hiptensorTensorDescriptor_t descA, descB;
 
         // Execution flow control
         uint32_t mRepeats;
